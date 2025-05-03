@@ -1,3 +1,8 @@
+PS:Department maintains student information. The file contains roll number, name, division and address. 
+Allow users to add, delete information about students. Display information of a particular employee. 
+If the record of the student does not exist an appropriate message is displayed. 
+If it is, then the system displays the student details. Use a sequential file to maintain the data.
+
 #include <iostream>
 #include <fstream>
 using namespace std;
