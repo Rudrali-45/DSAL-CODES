@@ -1,3 +1,7 @@
+PS:Consider a scenario for Hospital to cater services to different kinds of patients as 
+Serious (top priority), b) non-serious (medium priority), c) General Check-up (Least priority). 
+Implement the priority queue to cater services to the patients.
+
 #include<iostream>
 #include<string>
 //#define N 20
