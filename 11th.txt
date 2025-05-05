@@ -3,213 +3,168 @@ Allow users to add, delete information about students. Display information of a 
 If the record of the student does not exist an appropriate message is displayed. 
 If it is, then the system displays the student details. Use a sequential file to maintain the data.
 
-#include <iostream>
-#include <fstream>
-using namespace std;
 
-class student
-{
+#include <iostream> // Include the iostream library for input/output operations.
+#include <fstream>  // Include the fstream library for file input/output operations.
+using namespace std; // Use the standard namespace to avoid writing std:: before cout, cin, etc.
 
-	int roll_no;
-	char Name[30];
-	char Division[5];
-	char Address[50];
-	
+class student { // Define a class named 'student' to store student information.
+    int roll_no;     // Declare a private member variable 'roll_no' to store the student's roll number.
+    char Name[30];    // Declare a private member variable 'Name' (character array) to store the student's name.
+    char Division[5]; // Declare a private member variable 'Division' (character array) to store the student's division.
+    char Address[50];  // Declare a private member variable 'Address' (character array) to store the student's address.
 
-public:
-	void accept();
-	void display();
-	int rollno()
-	{
-		return roll_no;
-	}
-	
-};
+public:             // Start of the public section, meaning these members can be accessed from outside the class.
+    void accept();    // Declare a public member function 'accept' to get student information from the user.
+    void display();   // Declare a public member function 'display' to display student information.
+    int rollno() {  // Declare a public member function 'rollno' to return the student's roll number.
+        return roll_no; // Return the value of the 'roll_no' member variable.
+    }
+}; // End of the 'student' class definition.  Note the semicolon!
 
+void student::accept() { // Define the 'accept' function outside the class.  'student::' specifies it's a member of the student class.
+    cout << "\nEnter Roll Number: "; // Prompt the user to enter the roll number.
+    cin >> roll_no;    // Read the roll number from the user and store it in 'roll_no'.
+    cin.ignore();     // Consume the newline character left in the input buffer after reading the roll number.  Prevents issues with getline.
 
-void student::accept()
-{
-	cout<<"\nEnter Roll Number: ";
-	cin>>roll_no;
+    cout << "Enter Name: "; // Prompt the user to enter the name.
+    cin.getline(Name, 30); // Read the name from the user (including spaces) and store it in 'Name'.  Limits to 29 characters + null terminator.
 
-	cout<<"\nEnter Name: ";
-	cin.ignore();
-	cin.getline(Name,30);
-	
-	cout<<"\nEnter Division: ";
-	cin>>Division;
-	
-	cout<<"\nEnter Address: ";
-	cin>>Address;
+    cout << "Enter Division: "; // Prompt the user to enter the division.
+    cin >> Division;  // Read the division from the user and store it in 'Division'.
+    cin.ignore();     // Consume the newline character after reading the division
 
-	cout<<"\n";
+    cout << "Enter Address: "; // Prompt the user to enter the address.
+    cin.getline(Address, 50); // Read the address from the user (including spaces) and store it in 'Address'. Limits to 49 characters + null terminator.
+    cout << "\n";       // Print a newline character for formatting.
 }
 
-
-void student::display()
-{
-	cout<<"\n    "<<roll_no<<"\t  "<<Name<<"  \t\t "<<Division<<"\t      "<<Address;
+void student::display() { // Define the 'display' function outside the class.
+    cout << "\n     " << roll_no << "\t  " << Name << "\t\t" << Division << "\t    " << Address; // Display the student's roll number, name, division, and address, with tabs for formatting.
 }
 
+void create() { // Define a function named 'create' to create a file and write student records to it.
+    student s;       // Create a 'student' object named 's'.
+    int n;         // Declare an integer variable 'n' to store the number of records.
+    ofstream out("Student.txt", ios::binary); // Open a file named "Student.txt" in binary mode for output.
+    cout << "\nHow many records do you want to enter?: "; // Prompt the user to enter the number of records.
+    cin >> n;       // Read the number of records from the user and store it in 'n'.
 
-void create()
-{
-	student s;
-	int n, i;
+    for (int i = 0; i < n; i++) { // Loop 'n' times to get and write student records.
+        s.accept();     // Call the 'accept' function to get student data from the user.
+        out.write((char *)&s, sizeof(s)); // Write the contents of the 'student' object 's' to the file.  The '(char *)&s' part gets the memory address of 's' and casts it to a character pointer, which is what write() expects.  'sizeof(s)' provides the number of bytes to write.
+    }
 
-	ofstream out("Student.txt");
-	cout<<"\nHow many records do you want to enter?: ";
-	cin>>n;
-
-	for(i=0;i<n;i++)
-	{
-		s.accept();
-		out.write((char *)&s,sizeof(s));
-	}
-
-	out.close();
+    out.close();     // Close the output file.
 }
 
+void search() { // Define a function named 'search' to search for a student record by roll number.
+    int n, flag = 0; // Declare 'n' to store the roll number to search for, and 'flag' to indicate if the record is found.
+    cout << "\nEnter Roll Number To Be Searched: "; // Prompt the user to enter the roll number to search.
+    cin >> n;       // Read the roll number to search for from the user.
+    ifstream infile("Student.txt", ios::binary); // Open the file "Student.txt" in binary mode for input.
+    student s;       // Create a 'student' object 's' to store the records read from the file.
 
+    while (infile.read((char *)&s, sizeof(s))) { // Read records from the file until the end of the file is reached.
+        if (s.rollno() == n) { // Check if the roll number of the current record matches the roll number being searched for.
+            cout << "\nRecord Found\n"; // Display a message if the record is found.
+            cout << "\nRoll Number         Name                        Division            Address"; // Print header.
+            s.display();    // Call the 'display' function to display the found record.
+            flag = 1;     // Set 'flag' to 1 to indicate that the record was found.
+            break;       // Exit the loop since the record has been found.
+        }
+    }
 
-void search()
-{
-	int n, flag=0;
+    if (flag == 0) { // If the loop finishes without finding the record ('flag' is still 0).
+        cout << "\nRecord Not Found."; // Display a message indicating that the record was not found.
+    }
 
-	cout<<"\nEnter Roll Number To Be Searched: ";
-	cin>>n;
-	ifstream infile("Student.txt");
-
-	student s;
-	while(infile.read((char *)&s,sizeof(s)))
-	{
-		if(s.rollno()==n)
-		{
-			cout<<"\nRecord Found\n";
-			cout<<"\nRoll Number Name Division Address";
-			s.display();
-			flag=1;
-			break;
-		}
-	}
-
-	if(flag==0)
-	{
-		cout<<"\nRecord Not Found.";
-	}
-
-	infile.close();
+    infile.close();    // Close the input file.
 }
 
-
-
-void display()
-{
-	student s;
-	ifstream infile("Student.txt");
-	while(infile.read((char *)&s, sizeof(s)))
-	{
-		s.display();
-	}
-
-	infile.close();
+void display() { // Define a function named 'display' to display all student records in the file.
+    student s;       // Create a 'student' object 's'.
+    ifstream infile("Student.txt", ios::binary); // Open "Student.txt" for binary input.
+    while (infile.read((char *)&s, sizeof(s))) { // Read records from the file until the end.
+        s.display();    // Display each record.
+    }
+    infile.close();    // Close the input file.
 }
 
-
-void add_record()
-{
-	student s;
-	ofstream outfile("Student.txt",ios::app);
-	s.accept();
-	outfile.write((char *)&s,sizeof(s));
-	outfile.close();
-	cout<<"Record Successfully Added.";
+void add_record() { // Define a function to add a new student record to the end of the file.
+    student s;
+    ofstream outfile("Student.txt", ios::app | ios::binary); // Open the file in append mode ('ios::app') and binary mode.
+    s.accept();
+    outfile.write((char *)&s, sizeof(s));
+    outfile.close();
+    cout << "Record Successfully Added.";
 }
 
+void delete_record() {
+    int n, flag = 0;
+    cout << "\nEnter Roll Number Whose Record To Be Deleted: ";
+    cin >> n;
 
+    ifstream infile("Student.txt", ios::binary);
+    ofstream temp("temp.txt", ios::binary);
+    student s;
 
+    while (infile.read((char *)&s, sizeof(s))) {
+        if (s.rollno() != n) {
+            temp.write((char *)&s, sizeof(s));
+        } else {
+            flag = 1;
+            cout << "\nRecord Successfully Deleted.";
+        }
+    }
 
-void delete_record()
-{
-	int n, flag=0;
-	cout<<"\nEnter Roll Number Whose Record To Be Deleted:";
-	cin>>n;
-	ifstream infile("student.txt"); 
-	ofstream temp("temp.txt"); 
-	student s;
-	while(infile.read((char *)&s, sizeof(s)))
-	{
-		if(s.rollno()!=n)
-		{
-			temp.write((char *)&s, sizeof(s));
-		}
+    if (flag == 0) {
+        cout << "\nRecord Not Found.";
+    }
 
-		else
-		{
-			flag=1;
-			cout<<"\nRecord Successfully Deleted.";
-		}
-	}
-
-		if(flag==0)
-		{
-			cout<<"\nRecord Not Found.";
-		}
-
-		infile.close();
-		temp.close();
-		remove("Student.txt");
-		rename("temp.txt","Student.txt");
+    infile.close();
+    temp.close();
+    remove("Student.txt");
+    rename("temp.txt", "Student.txt");
 }
 
+int main() { // The main function, the entry point of the program.
+    int choice; // Declare an integer variable 'choice' to store the user's menu choice.
+    do {      // Start of a do-while loop, which executes at least once.
+        cout << "\n\nMenu:\n1) Create Database.\n2) Display.\n3) Add record.\n4) Search Record.\n5) Delete Record.\n6) Exit."; // Display the menu options.
+        cout << "\n\nEnter Your Choice: "; // Prompt the user to enter their choice.
+        cin >> choice;    // Read the user's choice from the input.
 
+        switch (choice) { // Start of a switch statement to handle different user choices.
+            case 1:
+                create();  // Call the 'create' function to create the database.
+                break;     // Exit the switch statement.
 
-int main()
-{
-	int choice;
-	ofstream out("Student.txt");
-	out.close();
-	do
-	{   cout<<"\n";
-		cout<<"\nMenu:\n1) Create Database.\n2) Display.\n3) Add record.\n4) Search Record.\n5)Delete Record.\n6) Exit.";
-		cout<<"\n\nEnter Your Choice:  ";
-		cin>>choice;
+            case 2:
+                cout << "\nRoll Number         Name                        Division            Address";
+                display(); // Call the 'display' function to display all records.
+                break;
 
-		switch(choice)
-		{
-			case 1:
-				cout<<"\n";
-				create();
-				break;
+            case 3:
+                add_record();
+                break;
 
-			case 2:
-				cout<<"\n";
-				cout<<"\nRoll Number Name Division Address";
-				display();
-				break;
+            case 4:
+                search();  // Call the 'search' function to search for a record.
+                break;
 
-			case 3:
-				cout<<"\n";
-				add_record();
-				break;
+            case 5:
+                delete_record();
+                break;
+            case 6:
+                cout << "\nYou Have Successfully Exited..."; // Display a message and exit.
+                break;
 
-			case 4:
-				cout<<"\n";
-				search();
-				break;
-		
-			case 5:
-				cout<<"\n";
-				delete_record();
-				break;
+            default:    // If the user enters an invalid choice.
+                cout << "\nInvalid Choice. Please Try Again."; // Display an error message.
+        }
+    } while (choice != 6); // Continue the loop as long as the user's choice is not 6 (Exit).
 
-			case 6:
-				cout<<"\n";
-				cout<<"You Have Successfully Exitted...";
-				break;
-		} 
-	}
-	while(choice!=6);
-
-	return 0;
+    return 0; // Return 0 to indicate successful program execution.
 }
+
