@@ -7,109 +7,118 @@ Use Height balance tree and find the complexity for finding a keyword.
 #include<iostream>
 using namespace std;
 
+// Class 'node' to represent a node in the AVL tree
 class node {
 public:
-    string key;
-    string meaning;
-    node *left, *right;
+    string key;     // Stores the keyword (e.g., a word from a dictionary)
+    string meaning; // Stores the meaning of the keyword
+    node *left, *right; // Pointers to the left and right child nodes
 };
 
+// Class 'AVL' to represent the AVL tree
 class AVL {
-    node *root;
+    node *root; // Pointer to the root of the AVL tree
 
 public:
     AVL() {
-        root = NULL;
+        root = NULL; // Constructor: Initializes the root to NULL (empty tree)
     }
 
-    void create();
-    node* insert(node *cur, node *temp);
-    node* balance(node *temp);
-    int dif(node *temp);
-    int height(node *temp);
-    int maximum(int a, int b);
+    void create();       // Function to create the AVL tree by inserting nodes
+    node* insert(node *cur, node *temp); // Function to insert a new node into the AVL tree
+    node* balance(node *temp);  // Function to balance the AVL tree after insertion/deletion
+    int dif(node *temp);      // Function to calculate the balance factor of a node
+    int height(node *temp);     // Function to calculate the height of a node
+    int maximum(int a, int b);   // Function to find the maximum of two integers
 
-    node* LL(node *par);
-    node* RR(node *par);
-    node* LR(node *par);
-    node* RL(node *par);
+    node* LL(node *par);   // Function to perform Left-Left rotation
+    node* RR(node *par);   // Function to perform Right-Right rotation
+    node* LR(node *par);   // Function to perform Left-Right rotation
+    node* RL(node *par);   // Function to perform Right-Left rotation
 
-    void ascending(node *temp);
-    void descending(node *temp);
-    void display();
+    void ascending(node *temp);   // Function to display the tree in ascending order (inorder traversal)
+    void descending(node *temp);  // Function to display the tree in descending order (reverse inorder traversal)
+    void display();      // Function to display the AVL tree in both ascending and descending order
 
-    bool search(node *cur, string key1);
-    void search_value();
+    bool search(node *cur, string key1); // Function to search for a keyword in the AVL tree
+    void search_value();    // Function to take keyword input from user and call search
 
-    node* delete_n(node *root, string key1);
-    void deleten();
+    node* delete_n(node *root, string key1); // Function to delete a node with a given key
+    void deleten();        // Function to take key input from user and call delete_n
 
-    node* extractmin(node *t);
+    node* extractmin(node *t);  //Function to find and remove the minimum node in a subtree
 };
 
+// Function to create the AVL tree
 void AVL::create() {
     char answer;
     node *temp;
     do {
-        temp = new node();
+        temp = new node(); // Create a new node
         cout << "\n Enter the keyword: ";
-        cin >> temp->key;
+        cin >> temp->key;   // Read the keyword
         cout << "\n Enter the meaning: ";
-        cin >> temp->meaning;
-        temp->left = temp->right = NULL;
+        cin >> temp->meaning; // Read the meaning
+        temp->left = temp->right = NULL; // Initialize left and right pointers to NULL
 
-        root = insert(root, temp);
+        root = insert(root, temp); // Insert the new node into the tree
 
         cout << "\n Do you want to add another word? (y/n): ";
         cin >> answer;
-    } while (answer == 'y' || answer == 'Y');
+    } while (answer == 'y' || answer == 'Y'); // Continue until the user enters 'n' or 'N'
 }
 
+// Function to insert a node into the AVL tree
 node* AVL::insert(node *cur, node *temp) {
     if (cur == NULL)
-        return temp;
+        return temp; // If the current node is NULL, return the new node (base case)
 
     if (temp->key < cur->key) {
-        cur->left = insert(cur->left, temp);
-        cur = balance(cur);
+        cur->left = insert(cur->left, temp); // Recursively insert into the left subtree
+        cur = balance(cur);             // Balance the tree after insertion
     } else if (temp->key > cur->key) {
-        cur->right = insert(cur->right, temp);
-        cur = balance(cur);
+        cur->right = insert(cur->right, temp); // Recursively insert into the right subtree
+        cur = balance(cur);            // Balance the tree after insertion
     }
-    return cur;
+    return cur; // Return the current node
 }
 
+// Function to balance the AVL tree
 node* AVL::balance(node *temp) {
-    int bal = dif(temp);
+    int bal = dif(temp); // Calculate the balance factor
 
-    if (bal >= 2) {
-        if (dif(temp->left) < 0)
+    if (bal >= 2) { // Left subtree is heavier
+        if (dif(temp->left) < 0) // Left-Right case
             temp = LR(temp);
-        else
+        else             // Left-Left case
             temp = LL(temp);
-    } else if (bal <= -2) {
-        if (dif(temp->right) > 0)
+    } else if (bal <= -2) { // Right subtree is heavier
+        if (dif(temp->right) > 0) // Right-Left case
             temp = RL(temp);
-        else
+        else              // Right-Right case
             temp = RR(temp);
     }
-    return temp;
+    return temp; // Return the balanced node
 }
 
+// Function to calculate the balance factor of a node
 int AVL::dif(node *temp) {
-    return height(temp->left) - height(temp->right);
+    return height(temp->left) - height(temp->right); // Difference between left and right subtree heights
 }
 
+// Function to calculate the height of a node
 int AVL::height(node *temp) {
     if (temp == NULL)
-        return -1;
-    return max(height(temp->left), height(temp->right)) + 1;
+        return -1; // Height of an empty tree is -1
+    return max(height(temp->left), height(temp->right)) + 1; // Height is max of left/right subtree heights + 1
 }
 
+// Function to find the maximum of two integers
 int AVL::maximum(int a, int b) {
-    return (a > b) ? a : b;
+    return (a > b) ? a : b; // Ternary operator to return the greater value
 }
 
+// Function to perform Left-Left rotation
 node* AVL::LL(node *par) {
     node *temp = par->left;
     par->left = temp->right;
@@ -117,6 +126,7 @@ node* AVL::LL(node *par) {
     return temp;
 }
 
+// Function to perform Right-Right rotation
 node* AVL::RR(node *par) {
     node *temp = par->right;
     par->right = temp->left;
@@ -124,50 +134,57 @@ node* AVL::RR(node *par) {
     return temp;
 }
 
+// Function to perform Left-Right rotation
 node* AVL::LR(node *par) {
-    par->left = RR(par->left);
-    return LL(par);
+    par->left = RR(par->left); // Rotate the left child first (RR)
+    return LL(par);          // Then rotate the parent (LL)
 }
 
+// Function to perform Right-Left rotation
 node* AVL::RL(node *par) {
-    par->right = LL(par->right);
-    return RR(par);
+    par->right = LL(par->right); // Rotate the right child first (LL)
+    return RR(par);           // Then rotate the parent (RR)
 }
 
+// Function to display the tree in ascending order (inorder traversal)
 void AVL::ascending(node *temp) {
     if (temp != NULL) {
-        ascending(temp->left);
-        cout << "\n\t" << temp->key << " : " << temp->meaning;
-        ascending(temp->right);
+        ascending(temp->left); // Recursively traverse the left subtree
+        cout << "\n\t" << temp->key << " : " << temp->meaning; // Print the key and meaning
+        ascending(temp->right); // Recursively traverse the right subtree
     }
 }
 
+// Function to display the tree in descending order (reverse inorder traversal)
 void AVL::descending(node *temp) {
     if (temp != NULL) {
-        descending(temp->right);
-        cout << "\n\t" << temp->key << " : " << temp->meaning;
-        descending(temp->left);
+        descending(temp->right); // Recursively traverse the right subtree
+        cout << "\n\t" << temp->key << " : " << temp->meaning; // Print the key and meaning
+        descending(temp->left); // Recursively traverse the left subtree
     }
 }
 
+// Function to display the AVL tree
 void AVL::display() {
     cout << "\n The keywords in ascending order are:\n";
-    ascending(root);
+    ascending(root);    // Display in ascending order
     cout << "\n\n The keywords in descending order are:\n";
-    descending(root);
+    descending(root);   // Display in descending order
     cout << endl;
 }
 
+// Function to search for a keyword in the AVL tree
 bool AVL::search(node *cur, string key1) {
     if (cur == NULL)
-        return false;
+        return false; // Key not found
     if (cur->key == key1)
-        return true;
+        return true;  // Key found
     if (key1 < cur->key)
-        return search(cur->left, key1);
-    return search(cur->right, key1);
+        return search(cur->left, key1); // Search in the left subtree
+    return search(cur->right, key1); // Search in the right subtree
 }
 
+// Function to take keyword input from user and call search
 void AVL::search_value() {
     string key2;
     cout << "\n Enter the keyword you wish to search: ";
@@ -178,30 +195,33 @@ void AVL::search_value() {
         cout << "\n The entered keyword is not present in the AVL tree.\n";
 }
 
+// Function to delete a node with a given key
 node* AVL::delete_n(node* cur, string key1) {
     if (!cur)
-        return cur;
+        return cur; // Key not found
 
     if (key1 < cur->key)
-        cur->left = delete_n(cur->left, key1);
+        cur->left = delete_n(cur->left, key1); // Delete from left subtree
     else if (key1 > cur->key)
-        cur->right = delete_n(cur->right, key1);
+        cur->right = delete_n(cur->right, key1); // Delete from right subtree
     else {
+        // Node to be deleted found
         node *l = cur->left;
         node *r = cur->right;
-        delete cur;
-        if (!r) return l;
+        delete cur; // Delete the current node
+        if (!r) return l; // If right child is NULL, return the left child
 
         node *m = r;
-        while (m->left)
+        while (m->left)  // Find the minimum node in the right subtree
             m = m->left;
-        m->right = extractmin(r);
-        m->left = l;
-        return balance(m);
+        m->right = extractmin(r); // Remove the minimum node from the right subtree
+        m->left = l;       // Make the left child of the deleted node, the left child of m
+        return balance(m);     // Balance the tree
     }
-    return balance(cur);
+    return balance(cur); // Balance the tree
 }
 
+// Function to find and remove the minimum node in a subtree
 node* AVL::extractmin(node *t) {
     if (!t->left)
         return t->right;
@@ -209,17 +229,19 @@ node* AVL::extractmin(node *t) {
     return balance(t);
 }
 
+// Function to take key input from user and call delete_n
 void AVL::deleten() {
     string key;
     cout << "\n Enter the keyword to be deleted: ";
     cin >> key;
-    root = delete_n(root, key);
+    root = delete_n(root, key); // Call the delete_n function
 }
 
+// Main function
 int main() {
     char c;
     int ch;
-    AVL a;
+    AVL a; // Create an AVL tree object
     do {
         cout << "\n*********************************";
         cout << "\n 1. Insert a keyword in AVL tree";
@@ -230,16 +252,17 @@ int main() {
         cin >> ch;
 
         switch (ch) {
-            case 1: a.create(); break;
-            case 2: a.display(); break;
-            case 3: a.search_value(); break;
-            case 4: a.deleten(); break;
+            case 1: a.create(); break;        // Insert nodes
+            case 2: a.display(); break;       // Display the tree
+            case 3: a.search_value(); break;  // Search for a keyword
+            case 4: a.deleten(); break;        // Delete a keyword
             default: cout << "\n Wrong choice! ";
         }
 
         cout << "\n Do you want to continue? (y/n): ";
         cin >> c;
 
-    } while (c == 'y' || c == 'Y');
+    } while (c == 'y' || c == 'Y'); // Continue until the user enters 'n' or 'N'
     return 0;
 }
+
