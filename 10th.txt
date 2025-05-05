@@ -6,100 +6,112 @@ Implement the priority queue to cater services to the patients.
 #include<string>
 //#define N 20
 using namespace std;
-string Q[10];
-int Pr[10];
-int r = -1,f = -1,n;
-void enqueue(string data,int p)
-{
-	int i;
-	if((f==0)&&(r==n-1)) 
-		cout<<"Queue is full";
-	else {
-		if(f==-1) { 
-			f = r = 0;
-			Q[r] = data;
-			Pr[r] = p;
+string Q[10];   // Declares a string array 'Q' of size 10 to store patient names (the queue).
+int Pr[10];     // Declares an integer array 'Pr' of size 10 to store the priority of each patient.
+int r = -1, f = -1, n; // Initializes 'r' (rear) and 'f' (front) of the queue to -1 (empty), and declares 'n' to store the number of patients.
 
-		}
-		else {
-			for(i = r;i>=f;i--)
- {
-				if(p>Pr[i]) {
-					Q[i+1] = Q[i];
-					Pr[i+1] = Pr[i];	
-				}
-				else break;
-			}
-			Q[i+1] = data;
-			Pr[i+1] = p;
-			r++;
-		}	
-	}
-
-}
-void print() { 
-	int i;
-	for(i=f;i<=r;i++) {
-		cout << "Patient's Name - "<<Q[i];
-		switch(Pr[i]) {
-			case 1: 
-				cout << " Priority - 'Checkup' " << endl;
-			break;
-			case 2:
-				cout << " Priority - 'Non-serious' " << endl;
-			break;
-			case 3:
-				cout << " Priority - 'Serious' " << endl;
-			break;
-			default:
-				cout << "Priority not found" << endl;
-		}
-	}
+// Function to enqueue (insert) a patient's name and priority into the priority queue.
+void enqueue(string data, int p) {
+    int i;
+    // Checks if the queue is full. This condition is true when the front is at the beginning (0) and the rear is at the end (n-1).
+    if ((f == 0) && (r == n - 1))
+        cout << "Queue is full";
+    else {
+        // If the queue is empty (front is -1).
+        if (f == -1) {
+            f = r = 0; // Set both front and rear to 0, indicating the first element.
+            Q[r] = data; // Store the patient's name at the rear.
+            Pr[r] = p;   // Store the patient's priority at the rear.
+        }
+        // If the queue is not empty.
+        else {
+            // Iterate backwards from the rear to the front of the queue.
+            for (i = r; i >= f; i--) {
+                // If the new patient's priority is higher than the current element's priority.
+                if (p > Pr[i]) {
+                    Q[i + 1] = Q[i];   // Shift the current patient's name to the next position.
+                    Pr[i + 1] = Pr[i];   // Shift the current patient's priority to the next position.
+                } else
+                    break; // If the new patient's priority is not higher, stop shifting.
+            }
+            Q[i + 1] = data; // Insert the new patient's name at the correct sorted position.
+            Pr[i + 1] = p;   // Insert the new patient's priority at the correct sorted position.
+            r++;             // Increment the rear pointer to point to the newly added element.
+        }
+    }
 }
 
-void dequeue() { 
-	if(f == -1) {
-		cout<<"Queue is Empty";
-	}	
-	else {
-	cout<<"deleted Element ="<<Q[f]<<endl;
-	cout<<"Its Priority = "<<Pr[f]<<endl;
-		if(f==r) f = r = -1;
-		else f++;
-	}
+// Function to print the elements (patient names and priorities) in the queue.
+void print() {
+    int i;
+    // Iterate from the front to the rear of the queue.
+    for (i = f; i <= r; i++) {
+        cout << "Patient's Name - " << Q[i]; // Print the patient's name.
+        // Switch statement to print the priority description based on the priority number.
+        switch (Pr[i]) {
+        case 1:
+            cout << " Priority - 'Checkup' " << endl;
+            break;
+        case 2:
+            cout << " Priority - 'Non-serious' " << endl;
+            break;
+        case 3:
+            cout << " Priority - 'Serious' " << endl;
+            break;
+        default:
+            cout << "Priority not found" << endl;
+        }
+    }
 }
 
+// Function to dequeue (remove) the element at the front of the queue.
+void dequeue() {
+    // Checks if the queue is empty (front is -1).
+    if (f == -1) {
+        cout << "Queue is Empty";
+    } else {
+        cout << "deleted Element =" << Q[f] << endl; // Print the name of the dequeued patient.
+        cout << "Its Priority = " << Pr[f] << endl;   // Print the priority of the dequeued patient.
+        // If the queue had only one element (front and rear are the same).
+        if (f == r)
+            f = r = -1; // Reset front and rear to -1, making the queue empty.
+        else
+            f++; // Increment the front pointer to the next element.
+    }
+}
+
+// The main function where the program execution begins.
 int main() {
-	string data;
-	int opt,i,p;
-	cout<<"Enter Your Choice:-"<<endl;
-	do {
-	cout << "1 for Insert the Data in Queue" << endl << "2 for show the Data in Queue " << endl << "3 for Delete the data from the Queue" 
-		<< endl << "0 for Exit"<< endl;
-	cin >> opt;
-		switch(opt) {
-			case 1:
-				cout << "Enter the number of patinent" << endl;
-				cin >> n;
-				i = 0;
-			for(i=0;i<n;i++) 
-			{
-					cout << "Enter your name of the patient : ";
-					cin >> data;
-cout << "Enter your Prioritys (3: serious, 2: non-serious, 1: genral checkup) : ";
-						cin >> p;
-						enqueue(data,p);
-						
-				}
-			break;
-			case 2:
-				print();
-			break;
-			case 3:
-				 dequeue();
-			break;
-		}
-	}while(opt!=0);
-        return 0;
+    string data; // Variable to store the patient's name.
+    int opt, i, p; // Variables for user's choice, loop counter, and priority.
+    cout << "Enter Your Choice:-" << endl; // Prompt the user to enter their choice.
+    do {
+        cout << "1 for Insert the Data in Queue" << endl << "2 for show the Data in Queue " << endl << "3 for Delete the data from the Queue"
+             << endl << "0 for Exit" << endl; // Display the menu options.
+        cin >> opt; // Read the user's choice.
+        // Switch statement to perform actions based on the user's choice.
+        switch (opt) {
+        case 1: // If the user chooses 1 (Insert data).
+            cout << "Enter the number of patinent" << endl; // Prompt for the number of patients to enqueue.
+            cin >> n;                                     // Read the number of patients.
+            i = 0;
+            // Loop to enqueue 'n' patients.
+            for (i = 0; i < n; i++) {
+                cout << "Enter your name of the patient : "; // Prompt for the patient's name.
+                cin >> data;                                 // Read the patient's name.
+                cout << "Enter your Prioritys (3: serious, 2: non-serious, 1: genral checkup) : "; // Prompt for the priority.
+                cin >> p;                                                                    // Read the priority.
+                enqueue(data, p);                                                             // Call the enqueue function.
+            }
+            break;
+        case 2: // If the user chooses 2 (Show data).
+            print(); // Call the print function to display the queue.
+            break;
+        case 3: // If the user chooses 3 (Delete data).
+            dequeue(); // Call the dequeue function to remove the front element.
+            break;
+        }
+    } while (opt != 0); // Continue the loop until the user enters 0 to exit.
+    return 0;           // Return 0 to indicate successful program execution.
 }
 
