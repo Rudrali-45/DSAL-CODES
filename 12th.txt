@@ -3,167 +3,271 @@ Allow user to add, delete information of employee. Display information of partic
 If employee does not exist an appropriate message is displayed. If it is, then the system displays the employee details. 
 Use index sequential file to maintain the data.
 
-#include <iostream> // Include the iostream library for input/output operations.
-#include <fstream>  // Include the fstream library for file input/output operations.
-using namespace std; // Use the standard namespace to avoid writing std:: before cout, cin, etc.
+#include <iostream> 
+#include <fstream>  
+#include <cstring>  
+#include <cstdlib>  
+using namespace std;
 
-class student { // Define a class named 'student' to store student information.
-    int roll_no;     // Declare a private member variable 'roll_no' to store the student's roll number.
-    char Name[30];    // Declare a private member variable 'Name' (character array) to store the student's name.
-    char Division[5]; // Declare a private member variable 'Division' (character array) to store the student's division.
-    char Address[50];  // Declare a private member variable 'Address' (character array) to store the student's address.
+class EMP_CLASS {
+    // Structure to hold employee record details
+    typedef struct EMPLOYEE {
+        char name[30];  
+        int emp_id;     
+        int salary;    
+    } Rec;
 
-public:             // Start of the public section, meaning these members can be accessed from outside the class.
-    void accept();    // Declare a public member function 'accept' to get student information from the user.
-    void display();   // Declare a public member function 'display' to display student information.
-    int rollno() {  // Declare a public member function 'rollno' to return the student's roll number.
-        return roll_no; // Return the value of the 'roll_no' member variable.
-    }
-}; // End of the 'student' class definition.  Note the semicolon!
+    // Structure to hold index record (Emp_ID and position in file)
+    typedef struct INDEX {
+        int emp_id;    
+        int position;  
+    } Ind_Rec;
 
-void student::accept() { // Define the 'accept' function outside the class.  'student::' specifies it's a member of the student class.
-    cout << "\nEnter Roll Number: "; // Prompt the user to enter the roll number.
-    cin >> roll_no;    // Read the roll number from the user and store it in 'roll_no'.
-    cin.ignore();     // Consume the newline character left in the input buffer after reading the roll number.  Prevents issues with getline.
+    Rec Records;       
+    Ind_Rec Ind_Records; 
 
-    cout << "Enter Name: "; // Prompt the user to enter the name.
-    cin.getline(Name, 30); // Read the name from the user (including spaces) and store it in 'Name'.  Limits to 29 characters + null terminator.
+public:
+    EMP_CLASS();         
+    void Create();        
+    void Display();       
+    void Update();        
+    void Delete();        
+    void Append();        
+    void Search();        
+};
 
-    cout << "Enter Division: "; // Prompt the user to enter the division.
-    cin >> Division;  // Read the division from the user and store it in 'Division'.
-    cin.ignore();     // Consume the newline character after reading the division
-
-    cout << "Enter Address: "; // Prompt the user to enter the address.
-    cin.getline(Address, 50); // Read the address from the user (including spaces) and store it in 'Address'. Limits to 49 characters + null terminator.
-    cout << "\n";       // Print a newline character for formatting.
+// Constructor for EMP_CLASS.  Initializes record data.
+EMP_CLASS::EMP_CLASS() {
+    strcpy(Records.name, "");   
+    Records.emp_id = -1;       
+    Records.salary = -1;      
 }
 
-void student::display() { // Define the 'display' function outside the class.
-    cout << "\n     " << roll_no << "\t  " << Name << "\t\t" << Division << "\t    " << Address; // Display the student's roll number, name, division, and address, with tabs for formatting.
+// Function to create the employee data file (EMP.DAT) and index file (IND.DAT)
+void EMP_CLASS::Create() {
+    int i = 0;
+    char ch = 'y';
+    fstream seqfile("EMP.DAT", ios::out | ios::binary);   
+    fstream indexfile("IND.DAT", ios::out | ios::binary); 
+
+    do {
+        cout << "\nEnter Name: ";
+        cin >> Records.name;
+        cout << "Enter Emp_ID: ";
+        cin >> Records.emp_id;
+        cout << "Enter Salary: ";
+        cin >> Records.salary;
+
+        seqfile.write((char *)&Records, sizeof(Records));    
+        Ind_Records.emp_id = Records.emp_id;               
+        Ind_Records.position = i;                         
+        indexfile.write((char *)&Ind_Records, sizeof(Ind_Records)); 
+
+        i++;
+        cout << "Do you want to add more records? (y/n): ";
+        cin >> ch;
+    } while (ch == 'y' || ch == 'Y');
+
+    seqfile.close();
+    indexfile.close();
 }
 
-void create() { // Define a function named 'create' to create a file and write student records to it.
-    student s;       // Create a 'student' object named 's'.
-    int n;         // Declare an integer variable 'n' to store the number of records.
-    ofstream out("Student.txt", ios::binary); // Open a file named "Student.txt" in binary mode for output.
-    cout << "\nHow many records do you want to enter?: "; // Prompt the user to enter the number of records.
-    cin >> n;       // Read the number of records from the user and store it in 'n'.
+// Function to display the employee records from the files
+void EMP_CLASS::Display() {
+    fstream seqfile("EMP.DAT", ios::in | ios::binary);  
+    fstream indexfile("IND.DAT", ios::in | ios::binary);
 
-    for (int i = 0; i < n; i++) { // Loop 'n' times to get and write student records.
-        s.accept();     // Call the 'accept' function to get student data from the user.
-        out.write((char *)&s, sizeof(s)); // Write the contents of the 'student' object 's' to the file.  The '(char *)&s' part gets the memory address of 's' and casts it to a character pointer, which is what write() expects.  'sizeof(s)' provides the number of bytes to write.
-    }
-
-    out.close();     // Close the output file.
-}
-
-void search() { // Define a function named 'search' to search for a student record by roll number.
-    int n, flag = 0; // Declare 'n' to store the roll number to search for, and 'flag' to indicate if the record is found.
-    cout << "\nEnter Roll Number To Be Searched: "; // Prompt the user to enter the roll number to search.
-    cin >> n;       // Read the roll number to search for from the user.
-    ifstream infile("Student.txt", ios::binary); // Open the file "Student.txt" in binary mode for input.
-    student s;       // Create a 'student' object 's' to store the records read from the file.
-
-    while (infile.read((char *)&s, sizeof(s))) { // Read records from the file until the end of the file is reached.
-        if (s.rollno() == n) { // Check if the roll number of the current record matches the roll number being searched for.
-            cout << "\nRecord Found\n"; // Display a message if the record is found.
-            cout << "\nRoll Number         Name                        Division            Address"; // Print header.
-            s.display();    // Call the 'display' function to display the found record.
-            flag = 1;     // Set 'flag' to 1 to indicate that the record was found.
-            break;       // Exit the loop since the record has been found.
+    cout << "\nThe Contents of the file are:\n";
+    while (indexfile.read((char *)&Ind_Records, sizeof(Ind_Records))) {
+        int offset = Ind_Records.position * sizeof(Rec);   
+        seqfile.seekg(offset, ios::beg);                  
+        seqfile.read((char *)&Records, sizeof(Records));    
+        if (Records.emp_id != -1) { 
+            cout << "\nName: " << Records.name;
+            cout << "\nEmp_ID: " << Records.emp_id;
+            cout << "\nSalary: " << Records.salary << "\n";
         }
     }
 
-    if (flag == 0) { // If the loop finishes without finding the record ('flag' is still 0).
-        cout << "\nRecord Not Found."; // Display a message indicating that the record was not found.
-    }
-
-    infile.close();    // Close the input file.
+    seqfile.close();
+    indexfile.close();
 }
 
-void display() { // Define a function named 'display' to display all student records in the file.
-    student s;       // Create a 'student' object 's'.
-    ifstream infile("Student.txt", ios::binary); // Open "Student.txt" for binary input.
-    while (infile.read((char *)&s, sizeof(s))) { // Read records from the file until the end.
-        s.display();    // Display each record.
-    }
-    infile.close();    // Close the input file.
-}
+// Function to update an existing employee record
+void EMP_CLASS::Update() {
+    int pos = -1, id;
+    char new_name[30];
+    int new_salary;
 
-void add_record() { // Define a function to add a new student record to the end of the file.
-    student s;
-    ofstream outfile("Student.txt", ios::app | ios::binary); // Open the file in append mode ('ios::app') and binary mode.
-    s.accept();
-    outfile.write((char *)&s, sizeof(s));
-    outfile.close();
-    cout << "Record Successfully Added.";
-}
+    cout << "\nEnter the Emp_ID to update: ";
+    cin >> id;
 
-void delete_record() {
-    int n, flag = 0;
-    cout << "\nEnter Roll Number Whose Record To Be Deleted: ";
-    cin >> n;
+    fstream seqfile("EMP.DAT", ios::in | ios::out | ios::binary);  
+    fstream indexfile("IND.DAT", ios::in | ios::binary);
 
-    ifstream infile("Student.txt", ios::binary);
-    ofstream temp("temp.txt", ios::binary);
-    student s;
-
-    while (infile.read((char *)&s, sizeof(s))) {
-        if (s.rollno() != n) {
-            temp.write((char *)&s, sizeof(s));
-        } else {
-            flag = 1;
-            cout << "\nRecord Successfully Deleted.";
+    while (indexfile.read((char *)&Ind_Records, sizeof(Ind_Records))) {
+        if (id == Ind_Records.emp_id) {
+            pos = Ind_Records.position;
+            break;
         }
     }
 
-    if (flag == 0) {
-        cout << "\nRecord Not Found.";
+    if (pos == -1) {
+        cout << "\nRecord not found!";
+        return;
     }
 
-    infile.close();
-    temp.close();
-    remove("Student.txt");
-    rename("temp.txt", "Student.txt");
+    cout << "\nEnter new Name: ";
+    cin >> new_name;
+    cout << "Enter new Salary: ";
+    cin >> new_salary;
+
+    int offset = pos * sizeof(Rec);    
+    seqfile.seekp(offset);           
+    strcpy(Records.name, new_name); 
+    Records.emp_id = id;          
+    Records.salary = new_salary;     
+
+    seqfile.write((char *)&Records, sizeof(Records)); 
+    cout << "\nRecord updated!";
+    seqfile.close();
+    indexfile.close();
 }
 
-int main() { // The main function, the entry point of the program.
-    int choice; // Declare an integer variable 'choice' to store the user's menu choice.
-    do {      // Start of a do-while loop, which executes at least once.
-        cout << "\n\nMenu:\n1) Create Database.\n2) Display.\n3) Add record.\n4) Search Record.\n5) Delete Record.\n6) Exit."; // Display the menu options.
-        cout << "\n\nEnter Your Choice: "; // Prompt the user to enter their choice.
-        cin >> choice;    // Read the user's choice from the input.
+// Function to delete an employee record (logical deletion)
+void EMP_CLASS::Delete() {
+    int id, pos = -1;
+    cout << "\nEnter Emp_ID to delete: ";
+    cin >> id;
 
-        switch (choice) { // Start of a switch statement to handle different user choices.
-            case 1:
-                create();  // Call the 'create' function to create the database.
-                break;     // Exit the switch statement.
+    fstream seqfile("EMP.DAT", ios::in | ios::out | ios::binary);  
+    fstream indexfile("IND.DAT", ios::in | ios::out | ios::binary);
 
-            case 2:
-                cout << "\nRoll Number         Name                        Division            Address";
-                display(); // Call the 'display' function to display all records.
-                break;
-
-            case 3:
-                add_record();
-                break;
-
-            case 4:
-                search();  // Call the 'search' function to search for a record.
-                break;
-
-            case 5:
-                delete_record();
-                break;
-            case 6:
-                cout << "\nYou Have Successfully Exited..."; // Display a message and exit.
-                break;
-
-            default:    // If the user enters an invalid choice.
-                cout << "\nInvalid Choice. Please Try Again."; // Display an error message.
+    while (indexfile.read((char *)&Ind_Records, sizeof(Ind_Records))) {
+        if (id == Ind_Records.emp_id) {
+            pos = Ind_Records.position;
+            break;
         }
-    } while (choice != 6); // Continue the loop as long as the user's choice is not 6 (Exit).
+    }
 
-    return 0; // Return 0 to indicate successful program execution.
+    if (pos == -1) {
+        cout << "\nRecord not found!";
+        return;
+    }
+
+    int offset = pos * sizeof(Rec);   
+    seqfile.seekp(offset);          
+    strcpy(Records.name, "");  
+    Records.emp_id = -1;      
+    Records.salary = -1;     
+    seqfile.write((char *)&Records, sizeof(Records)); 
+
+    offset = pos * sizeof(Ind_Rec);   
+    indexfile.seekp(offset);          
+    Ind_Records.emp_id = -1;       
+    Ind_Records.position = pos;  
+    indexfile.write((char *)&Ind_Records, sizeof(Ind_Records));
+
+    cout << "\nRecord deleted!";
+    seqfile.close();
+    indexfile.close();
+}
+
+// Function to append a new employee record to the files
+void EMP_CLASS::Append() {
+    fstream indexfile("IND.DAT", ios::in | ios::binary);
+    indexfile.seekg(0, ios::end);              
+    int pos = indexfile.tellg() / sizeof(Ind_Records); 
+    indexfile.close();
+
+    fstream seqfile("EMP.DAT", ios::app | ios::binary);  
+    indexfile.open("IND.DAT", ios::app | ios::binary);
+
+    cout << "\nEnter record to append:";
+    cout << "\nName: "; cin >> Records.name;
+    cout << "Emp_ID: "; cin >> Records.emp_id;
+    cout << "Salary: "; cin >> Records.salary;
+
+    seqfile.write((char *)&Records, sizeof(Records));    
+    Ind_Records.emp_id = Records.emp_id;               
+    Ind_Records.position = pos;                         
+    indexfile.write((char *)&Ind_Records, sizeof(Ind_Records)); 
+
+    cout << "\nRecord appended!";
+    seqfile.close();
+    indexfile.close();
+}
+
+// Function to search for an employee record by Emp_ID
+void EMP_CLASS::Search() {
+    int id, pos = -1;
+    cout << "\nEnter Emp_ID to search: ";
+    cin >> id;
+
+    fstream indexfile("IND.DAT", ios::in | ios::binary);
+    while (indexfile.read((char *)&Ind_Records, sizeof(Ind_Records))) {
+        if (id == Ind_Records.emp_id) {
+            pos = Ind_Records.position;
+            break;
+        }
+    }
+
+    if (pos == -1) {
+        cout << "\nRecord not found!";
+        return;
+    }
+
+    int offset = pos * sizeof(Rec);   
+    fstream seqfile("EMP.DAT", ios::in | ios::binary);
+    seqfile.seekg(offset, ios::beg);                  
+    seqfile.read((char *)&Records, sizeof(Records));    
+
+    if (Records.emp_id == -1) {
+        cout << "\nRecord was deleted.";
+    } else {
+        cout << "\nRecord found:";
+        cout << "\nName: " << Records.name;
+        cout << "\nEmp_ID: " << Records.emp_id;
+        cout << "\nSalary: " << Records.salary;
+    }
+
+    seqfile.close();
+    indexfile.close();
+}
+
+// Main function - entry point of the program
+int main() {
+    EMP_CLASS List;
+    char ans = 'y';
+    int choice;
+
+    do {
+        cout << "\n\nMain Menu";
+        cout << "\n1. Create";
+        cout << "\n2. Display";
+        cout << "\n3. Update";
+        cout << "\n4. Delete";
+        cout << "\n5. Append";
+        cout << "\n6. Search";
+        cout << "\n7. Exit";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: List.Create(); break;
+            case 2: List.Display(); break;
+            case 3: List.Update(); break;
+            case 4: List.Delete(); break;
+            case 5: List.Append(); break;
+            case 6: List.Search(); break;
+            case 7: exit(0);
+            default: cout << "Invalid choice!";
+        }
+
+        cout << "\nDo you want to go back to Main Menu? (y/n): ";
+        cin >> ans;
+    } while (ans == 'y' || ans == 'Y');
+
+    return 0;
 }
 
