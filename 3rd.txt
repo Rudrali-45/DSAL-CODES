@@ -2,73 +2,80 @@ PS:A book consists of chapters, chapters consist of sections and sections consis
 Construct a tree and print the nodes. Find the time and space requirements of your method. 
 
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h> // For exit()
+#include <string.h> // For strcmp()
 using namespace std;
 
+// Structure for a node in the Generalized Linked List (GLL)
 struct node {
-    char name[20];
-    node* next;   
-    node* down;   
-    int flag;     
+    char name[20]; // Stores the name of the book, chapter, section, or subsection
+    node* next;  // Pointer to the next node at the same level
+    node* down;  // Pointer to the first node in the level below (e.g., chapter under a book)
+    int flag;    // Flag to indicate if the node has a level below (1: yes, 0: no)
 };
 
+// Class 'Gll' to manage the Generalized Linked List
 class Gll {
-    char ch[20];
-    int n, i;
-    node *head = NULL, *temp = NULL, *t1 = NULL, *t2 = NULL;
-
+    char ch[20];     // Temporary character array (likely for storing names during input) - its usage should be checked for consistency
+    int n, i;        // n: number of items to insert (chapters, sections, etc.), i: loop counter
+    node *head = NULL, *temp = NULL, *t1 = NULL, *t2 = NULL; // Pointers for node manipulation:
+                                                          // head: head of the list, temp: temporary node,
+                                                          // t1, t2: other temporary nodes for traversal and insertion
 public:
-    node* create();      
-    void insertb();      
-    void insertc();      
-    void inserts();      
-    void insertss();     
-    void displayb();     
+    node* create();     // Function to create a new node
+    void insertb();    // Function to insert a book (at the top level)
+    void insertc();    // Function to insert chapters under a book
+    void inserts();    // Function to insert sections under a chapter
+    void insertss();   // Function to insert subsections under a section
+    void displayb();   // Function to display the GLL (book structure)
 };
 
+// Function to create a new node
 node* Gll::create() {
-    node* p = new node;
-    p->next = NULL;
-    p->down = NULL;
-    p->flag = 0;
+    node* p = new node; // Dynamically allocate memory for a new node
+    p->next = NULL;    // Initialize the 'next' pointer to NULL
+    p->down = NULL;    // Initialize the 'down' pointer to NULL
+    p->flag = 0;      // Initialize the 'flag' to 0 (indicating no sublevel initially)
 
     cout << "\nEnter the name: ";
-    cin >> p->name;
+    cin >> p->name;    // Read the name of the item (book, chapter, etc.)
 
-    return p;
+    return p;          // Return the pointer to the newly created node
 }
 
+// Function to insert a book
 void Gll::insertb() {
-    if (head == NULL) {
-        t1 = create();
-        head = t1;
+    if (head == NULL) { // If the list is empty (no book yet)
+        t1 = create();    // Create a new node for the book
+        head = t1;      // Make the new node the head (first book)
     } else {
-        cout << "\nBook already exists.";
+        cout << "\nBook already exists."; //  Only one book is allowed
     }
 }
 
+// Function to insert chapters under a book
 void Gll::insertc() {
     if (head == NULL) {
-        cout << "\nNo book available.";
+        cout << "\nNo book available."; // Cannot insert chapters if no book exists
     } else {
         cout << "\nHow many chapters do you want to insert? ";
-        cin >> n;
+        cin >> n;                   // Get the number of chapters to insert
 
         for (i = 0; i < n; i++) {
-            t1 = create();
-            if (head->flag == 0) {
-                head->down = t1;
-                head->flag = 1;
-            } else {
-                temp = head->down;
-                while (temp->next != NULL) temp = temp->next;
-                temp->next = t1;
+            t1 = create();            // Create a new node for the chapter
+            if (head->flag == 0) { // If the book has no chapters yet
+                head->down = t1;  // Make the new chapter the first chapter of the book
+                head->flag = 1;  // Set the flag to indicate that the book now has chapters
+            } else {             // If the book already has chapters
+                temp = head->down;  // Start from the first chapter
+                while (temp->next != NULL) temp = temp->next; // Go to the last chapter
+                temp->next = t1;   // Add the new chapter at the end
             }
         }
     }
 }
 
+// Function to insert sections under a chapter
 void Gll::inserts() {
     if (head == NULL) {
         cout << "\nNo book available.";
@@ -76,38 +83,39 @@ void Gll::inserts() {
     }
 
     cout << "\nEnter the name of chapter to insert section: ";
-    cin >> ch;
+    cin >> ch; // Get the name of the chapter to insert a section into
 
     if (head->flag == 0) {
-        cout << "\nNo chapters in book.";
+        cout << "\nNo chapters in book."; // No chapters
         return;
     }
 
-    temp = head->down;
+    temp = head->down; // Start from the first chapter
     while (temp != NULL) {
-        if (!strcmp(ch, temp->name)) {
+        if (!strcmp(ch, temp->name)) { // If the chapter is found
             cout << "\nHow many sections do you want to insert? ";
-            cin >> n;
+            cin >> n;               // Get the number of sections
 
             for (i = 0; i < n; i++) {
-                t1 = create();
-                if (temp->flag == 0) {
-                    temp->down = t1;
-                    temp->flag = 1;
+                t1 = create();        // Create a new node for the section
+                if (temp->flag == 0) { // If the chapter has no sections yet
+                    temp->down = t1; // Make the new section the first section of the chapter
+                    temp->flag = 1; // Set the flag
                     t2 = temp->down;
-                } else {
-                    while (t2->next != NULL) t2 = t2->next;
-                    t2->next = t1;
+                } else {           // If the chapter already has sections
+                    while (t2->next != NULL) t2 = t2->next; // Go to the last section
+                    t2->next = t1;  // Add the new section at the end
                 }
             }
             return;
         }
-        temp = temp->next;
+        temp = temp->next; // Go to the next chapter
     }
 
-    cout << "\nChapter not found.";
+    cout << "\nChapter not found."; // Chapter name not found
 }
 
+// Function to insert subsections under a section
 void Gll::insertss() {
     if (head == NULL) {
         cout << "\nNo book available.";
@@ -115,27 +123,27 @@ void Gll::insertss() {
     }
 
     cout << "\nEnter the name of chapter to insert subsection: ";
-    cin >> ch;
+    cin >> ch; // Get chapter name
 
     if (head->flag == 0) {
         cout << "\nNo chapters in book.";
         return;
     }
 
-    temp = head->down;
+    temp = head->down; // Start from the first chapter
     while (temp != NULL) {
-        if (!strcmp(ch, temp->name)) {
+        if (!strcmp(ch, temp->name)) { //chapter found
             cout << "\nEnter name of section to insert subsection: ";
-            cin >> ch;
+            cin >> ch; // Get section name
 
             if (temp->flag == 0) {
-                cout << "\nNo sections in chapter.";
+                cout << "\nNo sections in chapter."; //no sections
                 return;
             }
 
-            temp = temp->down;
+            temp = temp->down; // Start from the first section
             while (temp != NULL) {
-                if (!strcmp(ch, temp->name)) {
+                if (!strcmp(ch, temp->name)) { // Section found.
                     cout << "\nHow many subsections do you want to insert? ";
                     cin >> n;
 
@@ -154,55 +162,53 @@ void Gll::insertss() {
                 }
                 temp = temp->next;
             }
-
             cout << "\nSection not found.";
             return;
         }
         temp = temp->next;
     }
-
     cout << "\nChapter not found.";
 }
 
+// Function to display the GLL (book structure)
 void Gll::displayb() {
     if (head == NULL) {
         cout << "\nBook not found.";
         return;
     }
 
-    temp = head;
+    temp = head; // Start from the book node
     cout << "\nNAME OF BOOK: " << temp->name;
 
-    if (temp->flag == 1) {
-        temp = temp->down;
+    if (temp->flag == 1) { // If the book has chapters
+        temp = temp->down; // Go to the first chapter
 
         while (temp != NULL) {
             cout << "\n\tCHAPTER: " << temp->name;
             t1 = temp;
 
-            if (t1->flag == 1) {
-                t1 = t1->down;
+            if (t1->flag == 1) { // If the chapter has sections
+                t1 = t1->down;  // Go to the first section
                 while (t1 != NULL) {
                     cout << "\n\t\tSECTION: " << t1->name;
                     t2 = t1;
 
-                    if (t2->flag == 1) {
-                        t2 = t2->down;
+                    if (t2->flag == 1) { // If the section has subsections
+                        t2 = t2->down;  // Go to the first subsection
                         while (t2 != NULL) {
                             cout << "\n\t\t\tSUBSECTION: " << t2->name;
                             t2 = t2->next;
                         }
                     }
-
                     t1 = t1->next;
                 }
             }
-
             temp = temp->next;
         }
     }
 }
 
+// Main function - entry point of the program
 int main() {
     Gll g;
     int x;
@@ -228,6 +234,6 @@ int main() {
             default: cout << "\nInvalid choice!";
         }
     }
-
     return 0;
 }
+
