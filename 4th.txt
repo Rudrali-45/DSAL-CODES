@@ -2,133 +2,137 @@ PS:Beginning with an empty binary search tree, Construct binary search tree by i
 -i. Insert new node, ii. Find number of nodes in longest path from root, iii. Minimum data value found in the tree, iv. Change a tree so that the roles of the left and right pointers are swapped at every node, v. Search a value.
 
 #include <iostream>
-#include <cstdlib>
+#include <cstdlib> // Includes standard library functions like exit()
 using namespace std;
 
+// Class 'node' to represent a node in the BST
 class node {
 public:
-    int info;
-    node *left;
-    node *right;
-} *root;
+    int info;     // Stores the data (integer in this case) of the node
+    node *left;  // Pointer to the left child node
+    node *right; // Pointer to the right child node
+} *root; // Declares a global pointer 'root'.  It is generally better to manage the root within the class.
 
+// Class 'BST' to represent the Binary Search Tree
 class BST {
 public:
-    node *root;
+    node *root; // Pointer to the root of the BST.  This is better placed here than as a global variable.
 
-    BST() { root = NULL; }
+    BST() { root = NULL; } // Constructor: Initializes the root to NULL (empty tree)
 
-    void insert(node *, node *);
-    void display(node *, int);
-    int min(node *);
-    int height(node *);
-    void mirror(node *);
-    void preorder(node *);
-    void inorder(node *);
-    void postorder(node *);
-    void search(node *, int);
+    void insert(node *, node *); // Function to insert a new node into the BST
+    void display(node *, int);    // Function to display the BST (indented tree structure)
+    int min(node *);           // Function to find the minimum value in the BST
+    int height(node *);        // Function to calculate the height of the BST
+    void mirror(node *);       // Function to create the mirror image of the BST
+    void preorder(node *);     // Function to perform preorder traversal of the BST
+    void inorder(node *);      // Function to perform inorder traversal of the BST
+    void postorder(node *);    // Function to perform postorder traversal of the BST
+    void search(node *, int);   // Function to search for an element in the BST
 };
 
+// Main function - entry point of the program
 int main() {
     int choice, num;
-    BST bst;
-    node *temp;
+    BST bst;       // Create an object of the BST class
+    node *temp;    // Pointer to a temporary node
 
-    while (1) {
+    while (1) { // Infinite loop to display the menu and perform operations
         cout << "-----------------" << endl;
         cout << "Operations on BST" << endl;
         cout << "-----------------" << endl;
         cout << "1.Insert Element\n2.Display\n3.Min value find\n4.Height\n5.Mirror of node"
                 "\n6.Preorder\n7.Inorder\n8.Postorder\n9.No. of nodes in longest path"
-                "\n10.Search an element\n11.Quit\n";
+                "\n10.Search an element\n11.Quit\n"; // Menu options
         cout << "Enter your choice : ";
-        cin >> choice;
+        cin >> choice; // Read the user's choice
 
-        switch (choice) {
-            case 1:
-                temp = new node();
+        switch (choice) { // Switch statement to perform operations based on user's choice
+            case 1: // Insert a new element
+                temp = new node(); // Create a new node
                 cout << "Enter the number to be inserted : ";
-                cin >> temp->info;
-                bst.insert(bst.root, temp);
+                cin >> temp->info;    // Read the data for the new node
+                bst.insert(bst.root, temp); // Call the insert function
                 break;
-            case 2:
+            case 2: // Display the BST
                 cout << "Display BST:" << endl;
-                bst.display(bst.root, 1);
+                bst.display(bst.root, 1); // Call the display function
                 cout << endl;
                 break;
-            case 3:
-                cout << "Min value of tree: " << bst.min(bst.root) << endl;
+            case 3: // Find the minimum value
+                cout << "Min value of tree: " << bst.min(bst.root) << endl; // Call the min function
                 break;
-            case 4:
-                cout << "Height of tree = " << bst.height(bst.root) << endl;
+            case 4: // Calculate the height
+                cout << "Height of tree = " << bst.height(bst.root) << endl; // Call the height function
                 break;
-            case 5:
+            case 5: // Mirror the BST
                 cout << "Mirror\n";
-                bst.mirror(bst.root);
-                bst.display(bst.root, 1);
+                bst.mirror(bst.root); // Call the mirror function
+                bst.display(bst.root, 1);   // Display the mirrored tree
                 break;
-            case 6:
+            case 6: // Preorder traversal
                 cout << "\nDisplay preorder Binary tree = ";
-                bst.preorder(bst.root);
+                bst.preorder(bst.root); // Call the preorder function
                 cout << endl;
                 break;
-            case 7:
+            case 7: // Inorder traversal
                 cout << "\nDisplay inorder Binary tree = ";
-                bst.inorder(bst.root);
+                bst.inorder(bst.root);  // Call the inorder function
                 cout << endl;
                 break;
-            case 8:
+            case 8: // Postorder traversal
                 cout << "\nDisplay postorder Binary tree = ";
-                bst.postorder(bst.root);
+                bst.postorder(bst.root); // Call the postorder function
                 cout << endl;
                 break;
-            case 9:
-                cout << "No. of nodes in longest path from root is " << bst.height(bst.root) << endl;
+            case 9: // Number of nodes in the longest path (same as height)
+                cout << "No. of nodes in longest path from root is " << bst.height(bst.root) << endl; // Call the height function
                 break;
-            case 10:
+            case 10: // Search for an element
                 int searchdata;
                 cout << "Enter the element to be searched: ";
-                cin >> searchdata;
-                bst.search(bst.root, searchdata);
+                cin >> searchdata; // Read the element to search for
+                bst.search(bst.root, searchdata); // Call the search function
                 cout << endl;
                 break;
-            case 11:
-                exit(0);
-            default:
+            case 11: // Quit the program
+                exit(0); // Call the exit function to terminate the program
+            default: // Handle invalid choices
                 cout << "Wrong choice" << endl;
         }
     }
 }
 
+// Function to insert a node into the BST
 void BST::insert(node *tree, node *newnode) {
-    if (root == NULL) {
-        root = new node;
-        root->info = newnode->info;
+    if (root == NULL) { // If the tree is empty
+        root = new node; // Create the root node
+        root->info = newnode->info; // Copy the data
         root->left = NULL;
         root->right = NULL;
         cout << "Root Node is Added" << endl;
         return;
     }
 
-    if (tree->info == newnode->info) {
+    if (tree->info == newnode->info) { // If the data already exists
         cout << "Element already in the tree" << endl;
         return;
     }
 
-    if (tree->info > newnode->info) {
+    if (tree->info > newnode->info) { // If the new node's data is smaller
         if (tree->left != NULL) {
-            insert(tree->left, newnode);
+            insert(tree->left, newnode); // Recursively insert into the left subtree
         } else {
-            tree->left = newnode;
+            tree->left = newnode; // Insert the new node as the left child
             tree->left->left = NULL;
             tree->left->right = NULL;
             cout << "Node Added To Left" << endl;
         }
-    } else {
+    } else { // If the new node's data is greater
         if (tree->right != NULL) {
-            insert(tree->right, newnode);
+            insert(tree->right, newnode); // Recursively insert into the right subtree
         } else {
-            tree->right = newnode;
+            tree->right = newnode; // Insert the new node as the right child
             tree->right->left = NULL;
             tree->right->right = NULL;
             cout << "Node Added To Right" << endl;
@@ -136,22 +140,24 @@ void BST::insert(node *tree, node *newnode) {
     }
 }
 
+// Function to display the BST (indented tree structure)
 void BST::display(node *ptr, int level) {
     int i;
     if (ptr != NULL) {
-        display(ptr->right, level + 1);
+        display(ptr->right, level + 1); // Recursively display the right subtree
         cout << endl;
         if (ptr == root)
-            cout << "Root->:  ";
+            cout << "Root->:  "; // Identify the root node
         else {
             for (i = 0; i < level; i++)
-                cout << "       ";
+                cout << "        "; // Indentation for each level
         }
-        cout << ptr->info;
-        display(ptr->left, level + 1);
+        cout << ptr->info; // Print the node's data
+        display(ptr->left, level + 1);  // Recursively display the left subtree
     }
 }
 
+// Function to find the minimum value in the BST
 int BST::min(node *root) {
     node *temp;
     if (root == NULL) {
@@ -159,60 +165,66 @@ int BST::min(node *root) {
         return -1;
     } else {
         temp = root;
-        while (temp->left != NULL)
+        while (temp->left != NULL) // Traverse to the leftmost node
             temp = temp->left;
-        return temp->info;
+        return temp->info; // Return the data of the leftmost node (minimum value)
     }
 }
 
+// Function to calculate the height of the BST
 int BST::height(node *root) {
     int htleft, htright;
     if (root == NULL)
-        return 0;
+        return 0; // Height of an empty tree is 0
     if (root->left == NULL && root->right == NULL)
-        return 1;
+        return 1; // Height of a leaf node is 1
 
-    htleft = height(root->left);
-    htright = height(root->right);
+    htleft = height(root->left);  // Recursively calculate the height of the left subtree
+    htright = height(root->right); // Recursively calculate the height of the right subtree
 
-    return (htright >= htleft ? htright : htleft) + 1;
+    return (htright >= htleft ? htright : htleft) + 1; // Return the greater height + 1
 }
 
+// Function to create the mirror image of the BST
 void BST::mirror(node *root) {
     node *temp;
     if (root != NULL) {
         temp = root->left;
-        root->left = root->right;
+        root->left = root->right; // Swap left and right children
         root->right = temp;
-        mirror(root->left);
-        mirror(root->right);
+        mirror(root->left);  // Recursively mirror the left subtree
+        mirror(root->right); // Recursively mirror the right subtree
     }
 }
 
+// Function to perform preorder traversal of the BST
 void BST::preorder(node *ptr) {
     if (ptr != NULL) {
-        cout << ptr->info << "\t";
-        preorder(ptr->left);
-        preorder(ptr->right);
+        cout << ptr->info << "\t"; // Process the current node
+        preorder(ptr->left);     // Traverse the left subtree
+        preorder(ptr->right);    // Traverse the right subtree
     }
 }
 
+// Function to perform inorder traversal of the BST
 void BST::inorder(node *ptr) {
     if (ptr != NULL) {
-        inorder(ptr->left);
-        cout << ptr->info << "\t";
-        inorder(ptr->right);
+        inorder(ptr->left);     // Traverse the left subtree
+        cout << ptr->info << "\t"; // Process the current node
+        inorder(ptr->right);    // Traverse the right subtree
     }
 }
 
+// Function to perform postorder traversal of the BST
 void BST::postorder(node *ptr) {
     if (ptr != NULL) {
-        postorder(ptr->left);
-        postorder(ptr->right);
-        cout << ptr->info << "\t";
+        postorder(ptr->left);    // Traverse the left subtree
+        postorder(ptr->right);   // Traverse the right subtree
+        cout << ptr->info << "\t"; // Process the current node
     }
 }
 
+// Function to search for an element in the BST
 void BST::search(node *ptr, int searchdata) {
     if (ptr == NULL) {
         cout << "Element not found..." << endl;
@@ -222,8 +234,9 @@ void BST::search(node *ptr, int searchdata) {
     if (ptr->info == searchdata) {
         cout << "Element Found..." << endl;
     } else if (ptr->info < searchdata) {
-        search(ptr->right, searchdata);
+        search(ptr->right, searchdata); // Search in the right subtree
     } else {
-        search(ptr->left, searchdata);
+        search(ptr->left, searchdata);  // Search in the left subtree
     }
 }
+
