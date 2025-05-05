@@ -18,84 +18,84 @@ int r[20][20],n; // 'n' stores the number of keys
 int main()
 {
 	int i;
-	cout<<"\n**** PROGRAM FOR OBST ******\n"; // Prints program title
-	cout<<"\nEnter the no. of nodes : "; // Prompts user to enter the number of keys
-	cin>>n; // Reads the number of keys
+	cout<<"\n**** PROGRAM FOR OBST ******\n"; // Prints the title of the program to the console.
+	cout<<"\nEnter the no. of nodes : "; // Prompts the user to enter the total number of keys for the BST.
+	cin>>n; // Reads the integer value entered by the user and stores it in the variable 'n'.
 
 	cout<<"\nEnter the probability for successful search :: ";
 	cout<<"\n----------------\n";
-	for(i=1;i<=n;i++) // Loop to read probabilities for successful searches (p1, p2, ..., pn)
+	for(i=1;i<=n;i++) // Loop that iterates 'n' times, from 1 to 'n' (inclusive), to get probabilities for each key.
 	{
-		cout<<"p["<<i<<"]";
-		cin>>a[i]; // Reads probability pi and stores in a[i]
+		cout<<"p["<<i<<"]"; // Prompts the user to enter the probability for the i-th key.
+		cin>>a[i]; // Reads the floating-point value entered by the user and stores it in the i-th position of the array 'a'. This array stores probabilities of successful searches.
 	}
 
 	cout<<"\nEnter the probability for unsuccessful search :: ";
 	cout<<"\n------------------\n";
-	for(i=0;i<=n;i++) // Loop to read probabilities for unsuccessful searches (q0, q1, ..., qn)
+	for(i=0;i<=n;i++) // Loop that iterates 'n+1' times, from 0 to 'n' (inclusive), to get probabilities for dummy nodes (representing unsuccessful searches).
 	{
-		cout<<"q["<<i<<"]";
-		cin>>b[i]; // Reads probability qi and stores in b[i]
+		cout<<"q["<<i<<"]"; // Prompts the user to enter the probability for the i-th dummy node.
+		cin>>b[i]; // Reads the floating-point value entered by the user and stores it in the i-th position of the array 'b'. This array stores probabilities of unsuccessful searches.
 	}
 
-	con_obst(); // Calls the function to construct the optimal BST
-	print(0,n); // Calls the function to print the structure of the optimal BST
-	cout<<endl;
-	return 0; // Returns 0 to indicate successful execution
+	con_obst(); // Calls the function 'con_obst' which constructs the optimal Binary Search Tree based on the input probabilities.
+	print(0,n); // Calls the function 'print' to display the structure of the constructed optimal BST. The arguments 0 and 'n' define the initial range of keys.
+	cout<<endl; // Prints a newline character to the console for better formatting.
+	return 0; // Returns 0 to the operating system, indicating that the program executed successfully.
 }
 
-// Function to construct the optimal BST
+// Function to construct the optimal BST using dynamic programming
 void con_obst(void)
 {
 	int i,j,k,l,min;
-	for(i=0;i<n;i++)
-	{ 	//Initialisation
-		c[i][i]=0.0; // Cost of empty subtree
-		r[i][i]=0; // Root of empty subtree
-		wt[i][i]=b[i]; // Weight of subtree with dummy node qi
-		// for j-i=1 can be j=i+1
-		wt[i][i+1]=b[i]+b[i+1]+a[i+1]; // Weight of subtree containing  ki+1
-		c[i][i+1]=b[i]+b[i+1]+a[i+1]; // Cost of subtree containing ki+1
-		r[i][i+1]=i+1; // Root of subtree containing ki+1 is ki+1
-	}
-	c[n][n]=0.0; // Cost of empty subtree
-	r[n][n]=0; // Root of empty subtree
-	wt[n][n]=b[n]; // Weight of subtree with dummy node qn
-	//for j-i=2,3,4....,n
-	for(i=2;i<=n;i++) // Loop to iterate over subtree lengths
+	for(i=0;i<n;i++) // Loop that iterates from 0 to 'n-1' (inclusive). This loop initializes the cost, root, and weight for subtrees containing only dummy nodes.
 	{
-		for(j=0;j<=n-i;j++) // Loop to iterate over starting indices of subtrees
+		c[i][i]=0.0; // The cost of a subtree with no actual keys (only a dummy node) is 0.
+		r[i][i]=0; // The root of a subtree with no actual keys is considered 0.
+		wt[i][i]=b[i]; // The weight of a subtree with only the i-th dummy node is the probability of unsuccessful search 'b[i]'.
+		// for j-i=1 can be j=i+1
+		wt[i][i+1]=b[i]+b[i+1]+a[i+1]; // The weight of a subtree containing only the key 'k[i+1]' and the dummy nodes 'q[i]' and 'q[i+1]' is the sum of their probabilities.
+		c[i][i+1]=b[i]+b[i+1]+a[i+1]; // The cost of a subtree containing only the key 'k[i+1]' is initially equal to its weight.
+		r[i][i+1]=i+1; // The root of a subtree containing only 'k[i+1]' is 'i+1'.
+	}
+	c[n][n]=0.0; // The cost of a subtree with only the dummy node 'q[n]' is 0.
+	r[n][n]=0; // The root of a subtree with only the dummy node 'q[n]' is 0.
+	wt[n][n]=b[n]; // The weight of a subtree with only the dummy node 'q[n]' is its probability 'b[n]'.
+	//for j-i=2,3,4....,n
+	for(i=2;i<=n;i++) // Outer loop that iterates through different lengths of subtrees, starting from length 2 up to 'n'.
+	{
+		for(j=0;j<=n-i;j++) // Inner loop that iterates through all possible starting positions 'j' for a subtree of length 'i'.
 		{
-			wt[j][j+i]=b[j+i]+a[j+i]+wt[j][j+i-1]; // Calculate weight of the subtree
-			c[j][j+i]=9999; // Initialize cost to a large value
-			for(l=j+1;l<=j+i;l++) // Loop to find the best root for the subtree
+			wt[j][j+i]=b[j+i]+a[j+i]+wt[j][j+i-1]; // Calculates the weight of the subtree from index 'j' to 'j+i'. It includes the probability of the last dummy node, the last key, and the weight of the preceding subtree.
+			c[j][j+i]=9999; // Initializes the cost of the subtree from 'j' to 'j+i' to a very large value, representing infinity, to find the minimum cost.
+			for(l=j+1;l<=j+i;l++) // Loop that iterates through all possible root positions 'l' within the current subtree (from 'j+1' to 'j+i').
 			{
-				if(c[j][j+i]>(c[j][l-1]+c[l][j+i])) // Check if choosing 'l' as root improves the cost
+				if(c[j][j+i]>(c[j][l-1]+c[l][j+i])) // Checks if choosing 'l' as the root results in a lower cost than the current minimum cost. It considers the costs of the left and right subtrees formed by choosing 'l' as the root.
 				{
-					c[j][j+i]=c[j][l-1]+c[l][j+i]; // Update cost if a better root is found
-					r[j][j+i]=l; // Store the best root for the subtree
+					c[j][j+i]=c[j][l-1]+c[l][j+i]; // If a better root 'l' is found, update the cost of the subtree.
+					r[j][j+i]=l; // Store the index 'l' as the root of the optimal subtree from 'j' to 'j+i'.
 				}
 			}
-			c[j][j+i]+=wt[j][j+i]; // Add the weight of the subtree to its cost
+			c[j][j+i]+=wt[j][j+i]; // After finding the best root for the subtree, add the weight of the entire subtree to its cost. This is because the root node is visited once for every node in its subtree.
 		}
-		cout<<endl;
+		cout<<endl; // Prints a newline character after processing all subtrees of a particular length.
 	}
 	cout<<"\n\nOptimal BST is :: ";
-	cout<<"\nw[0]["<<n<<"] :: "<<wt[0][n]; // Prints the weight of the optimal BST
-	cout<<"\nc[0]["<<n<<"] :: "<<c[0][n]; // Prints the cost of the optimal BST
-	cout<<"\nr[0]["<<n<<"] :: "<<r[0][n]; // Prints the root of the optimal BST
+	cout<<"\nw[0]["<<n<<"] :: "<<wt[0][n]; // Prints the total weight of the optimal BST, which is the sum of all successful and unsuccessful search probabilities.
+	cout<<"\nc[0]["<<n<<"] :: "<<c[0][n]; // Prints the minimum cost of the optimal BST.
+	cout<<"\nr[0]["<<n<<"] :: "<<r[0][n]; // Prints the root of the overall optimal BST (for the range 0 to 'n').
 }
 
-// Function to print the structure of the optimal BST (recursive)
+// Function to print the structure of the optimal BST recursively
 void print(int l1,int r1)
 {
-	if(l1>=r1) // Base case: if left index is greater or equal to right index, return
+	if(l1>=r1) // Base case for the recursion: if the left index is greater than or equal to the right index, it means we have reached an empty subtree, so we return.
 		return;
-	if(r[l1][r[l1][r1]-1]!=0)
-		cout<<"\n Left child of "<<r[l1][r1]<<" :: "<<r[l1][r1][r1]-1; // Print left child
-	if(r[r[l1][r1]][r1]!=0)
-		cout<<"\n Right child of "<<r[l1][r1]<<" :: "<<r[r[l1][r1]][r1]; // Print right child
-	print(l1,r[l1][r1]-1); // Recursively print the left subtree
-	print(r[l1][r1],r1); // Recursively print the right subtree
-	return;
+	if(r[l1][r[l1][r1]-1]!=0) // Checks if the left child of the current root exists (not 0). The left child's range is from 'l1' to 'r[l1][r1]-1'.
+		cout<<"\n Left child of "<<r[l1][r1]<<" :: "<<r[l1][r[l1][r1]-1]; // Prints the root of the left subtree as the left child of the current root. Note: There's a potential logical error here: `r[l1][r[l1][r1]-1]` is likely intended, but `r[l1][r1][r1]-1` accesses an element as if 'r' were a 3D array. It should be `r[l1][r[l1][r1]-1]`.
+	if(r[r[l1][r1]][r1]!=0) // Checks if the right child of the current root exists (not 0). The right child's range is from 'r[l1][r1]' to 'r1'.
+		cout<<"\n Right child of "<<r[l1][r1]<<" :: "<<r[r[l1][r1]][r1]; // Prints the root of the right subtree as the right child of the current root.
+	print(l1,r[l1][r1]-1); // Recursive call to print the structure of the left subtree.
+	print(r[l1][r1],r1); // Recursive call to print the structure of the right subtree.
+	return; // Returns from the function after printing the subtree structure.
 }
