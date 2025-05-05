@@ -3,7 +3,7 @@ Data : Set of (key,value) pairs, key are map to value, keys must be comparable, 
 Standard operation : Insert (key,value), Find (key), Delete (key).
 
 #include <iostream>
-#include <cstring> // Use <cstring> instead of <string.h>
+#include <cstring> // Use <cstring> instead of <string.h>  --> Corrected Header
 
 using namespace std;
 
@@ -25,18 +25,18 @@ public:
 
 HashFunction::HashFunction() {
     for (int i = 0; i < 10; i++) {
-        h[i].key = -1;
-        strcpy(h[i].name, "NULL");
+        h[i].key = -1;          // Initialize key to -1 (indicating empty slot)
+        strcpy(h[i].name, "NULL"); // Initialize name to "NULL"
     }
 }
 
 void HashFunction::Delete(long k) {
-    int index = find(k);
+    int index = find(k);       // Find the index of the key to delete
     if (index == -1) {
         cout << "\n\tKey Not Found";
     } else {
-        h[index].key = -1;
-        strcpy(h[index].name, "NULL");
+        h[index].key = -1;      // Set the key to -1 to mark the slot as empty
+        strcpy(h[index].name, "NULL"); // Set the name to "NULL"
         cout << "\n\tKey is Deleted";
     }
 }
@@ -48,7 +48,7 @@ int HashFunction::find(long k) {
             return i;
         }
     }
-    return -1;
+    return -1; // Return -1 if the key is not found
 }
 
 void HashFunction::display() {
@@ -73,19 +73,19 @@ void HashFunction::insert() {
         cin >> k;
         cout << "\n\tEnter a Client Name: ";
         cin >> n;
-        hi = k % 10;
+        hi = k % 10;  // Calculate the hash index (simple modulo 10)
 
-        if (h[hi].key == -1) {
+        if (h[hi].key == -1) { // If the slot is empty
             h[hi].key = k;
             strcpy(h[hi].name, n);
-        } else {
-            if (h[hi].key % 10 != hi) {
+        } else { // Collision occurred
+            if (h[hi].key % 10 != hi) { // Check if existing key is not at its correct position
                 temp = h[hi].key;
                 strcpy(ntemp, h[hi].name);
                 h[hi].key = k;
-                strcpy(h[hi].name, n);
+                strcpy(h[hi].name, n);  //replace the existing key with the new key
 
-                for (int i = hi + 1; i < 10; i++) {
+                for (int i = hi + 1; i < 10; i++) { //find the next empty slot
                     if (h[i].key == -1) {
                         h[i].key = temp;
                         strcpy(h[i].name, ntemp);
@@ -94,14 +94,14 @@ void HashFunction::insert() {
                     }
                 }
 
-                for (int i = 0; i < hi && flag == 0; i++) {
+                for (int i = 0; i < hi && flag == 0; i++) { //if not found, search from the beginning
                     if (h[i].key == -1) {
                         h[i].key = temp;
                         strcpy(h[i].name, ntemp);
                         break;
                     }
                 }
-            } else {
+            } else { // If the existing key is at its correct position, find next empty slot.
                 for (int i = hi + 1; i < 10; i++) {
                     if (h[i].key == -1) {
                         h[i].key = k;
@@ -153,21 +153,5 @@ int main() {
                 index = obj.find(k);
                 if (index == -1) {
                     cout << "\n\tKey Not Found";
-                }
-                break;
-            case 4:
-                cout << "\n\tEnter a Key Which You Want to Delete: ";
-                cin >> k;
-                obj.Delete(k);
-                break;
-            case 5:
-                break;
-        }
-
-        cout << "\n\t..... Do You Want to Continue in Main Menu (y/n)? ";
-        cin >> ans;
-    } while (ans == 'y' || ans == 'Y');
-
-    return 0;
-}
+              
 
