@@ -1,0 +1,23 @@
+Write a program to show the temperature and shows a graph of the recent 
+measurements 
+
+
+int inPin = A0; 
+float tempC = 0; 
+int n = 0; 
+void setup() 
+{ 
+Serial.begin(9600); 
+} 
+void loop() 
+{ 
+int value = analogRead(inPin); // read the value from the sensor 
+tempC = ((value * 0.00488) - 0.5) * 100; 
+//Serial.print("Temperature in Celsius = "); 
+Serial.println(tempC); 
+if(n==30) 
+{ 
+n=0; 
+delay(5000); 
+} 
+}

@@ -1,0 +1,14 @@
+Write a program using piezo element and use it to play a tune after someone knocks
+
+
+int pin=8; 
+void setup() 
+{ 
+} 
+void loop() 
+{ 
+tone(8,200); 
+delay(2000);// Wait for 2000 millisecond(s) 
+noTone(8); 
+delay(2000);// Wait for 2000 millisecond(s) 
+}

@@ -1,0 +1,17 @@
+ Write a program read the temperature sensor and send the values to the 
+serial monitor on the computer.
+
+
+#define DHTPIN 2 
+void setup() 
+{ 
+Serial.begin(9600); 
+} 
+void loop() 
+{ 
+int temperature = analogRead(DHTPIN); 
+Serial.print("Temperature is: "); 
+Serial.print(temperature); 
+Serial.println(" degree Fahrenheit "); 
+delay(2000); 
+} 
